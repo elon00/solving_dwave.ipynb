@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install nbconvert
+        run: pip install nbconvert jupyter
+      - name: Validate notebooks
+        run: |
+          for nb in $(find . -name '*.ipynb' -not -path './.git/*'); do
+            echo "Checking $nb"
+            jupyter nbconvert --to notebook --execute --stdout "$nb" > /dev/null
+          done
